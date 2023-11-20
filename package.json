@@ -1,0 +1,25 @@
+{
+  "name": "repositree",
+  "version": "0.1.0",
+  "description": "git command-line wrapper",
+  "main": "dist/repositree.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "ts": "tsc",
+    "webpack": "webpack",
+    "clean": "rm -r dist lib",
+    "build": "npm run clean && tsc && webpack && mv lib/index.d.ts lib/types dist/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Yujŏnja <hardboiled65@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.23.3",
+    "@babel/preset-env": "^7.23.3",
+    "@types/node": "^20.9.2",
+    "babel-loader": "^9.1.3",
+    "typescript": "^5.2.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  }
+}
