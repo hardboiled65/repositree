@@ -1,5 +1,3 @@
-import fs from 'fs'
-
 import { RepositreeInstance } from './types'
 import { repositreeInstanceHelper } from './helpers'
 
