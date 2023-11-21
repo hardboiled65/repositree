@@ -1,6 +1,6 @@
 {
   "name": "repositree",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "git command-line wrapper",
   "main": "dist/repositree.js",
   "types": "dist/index.d.ts",

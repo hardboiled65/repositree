@@ -19,3 +19,5 @@ repo.cdTree('src');
 console.log(repo.currentTree);
 
 console.log(repo.lsTree());
+
+console.log(repo.catFile('index.ts'));

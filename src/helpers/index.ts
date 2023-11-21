@@ -113,7 +113,10 @@ function repositreeInstanceHelper(repoDir: string): RepositreeInstance {
       const found = ls.find(object => {
         return object.name === fileName;
       });
-      const cmd = `cd ${this.fullPath} && git cat-file ${found.hash}`;
+      if (found === undefined) {
+        throw Error('No such file.');
+      }
+      const cmd = `cd ${this.fullPath} && git cat-file blob ${found.hash}`;
 
       try {
         const output = child_process.execSync(cmd, { encoding: 'utf-8' });
