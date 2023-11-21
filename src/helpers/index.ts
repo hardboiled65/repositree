@@ -1,5 +1,6 @@
 import child_process from 'child_process'
 import fs from 'fs'
+import path from 'path'
 
 import { RepositreeInstance, TreeObject, ObjectType } from '../types'
 
@@ -14,8 +15,13 @@ function gitVersion(): string {
 function repositreeInstanceHelper(repoDir: string): RepositreeInstance {
   let exists = false;
   try {
-    const dir = fs.readdirSync(repoDir);
-    if (dir.includes('.git')) {
+    const cmd = `cd ${repoDir} && git rev-parse --is-inside-work-tree`;
+    const altCmd = `cd ${repoDir} && git rev-parse --is-bare-repository`;
+
+    const output = child_process.execSync(cmd, { encoding: 'utf-8' }).trim();
+    const altOutput = child_process.execSync(altCmd, { encoding: 'utf-8' }).trim();
+
+    if (output === 'true' || altOutput === 'true') {
       exists = true;
     } else {
       exists = false;
@@ -24,8 +30,10 @@ function repositreeInstanceHelper(repoDir: string): RepositreeInstance {
     exists = false;
   }
 
+  const name = path.basename(repoDir);
+
   const instance: RepositreeInstance = {
-    name: '',
+    name: name,
     fullPath: repoDir,
     exists: exists,
     currentBranch: ((): string => {
@@ -36,17 +44,20 @@ function repositreeInstanceHelper(repoDir: string): RepositreeInstance {
     })(),
     currentTree: 'HEAD',
 
-    branches: (): string[] => {
+    branches: function(): string[] {
       const cmd = `cd ${repoDir} && git branch`;
       const output = child_process.execSync(cmd, { encoding: 'utf-8' });
       const lines = output.split('\n');
 
       return lines.map(line => {
+        if (line.trim() === '') {
+          return;
+        }
         return line.replace('*', '').trim();
       });
     },
 
-    switchBranch: (branch: string) => {
+    switchBranch: function(branch: string) {
       if (!this.branches().includes(branch)) {
         throw Error('No such branch.');
       }
@@ -55,7 +66,7 @@ function repositreeInstanceHelper(repoDir: string): RepositreeInstance {
       this.currentBranch = branch;
     },
 
-    lsTree: (): TreeObject[] => {
+    lsTree: function(): TreeObject[] {
       const cmd = `cd ${this.fullPath} && git ls-tree ${this.currentTree}`;
       let treeObjects: TreeObject[] = [];
 
@@ -86,7 +97,7 @@ function repositreeInstanceHelper(repoDir: string): RepositreeInstance {
       return treeObjects;
     },
 
-    cdTree: (treeName: string) => {
+    cdTree: function(treeName: string) {
       const ls: TreeObject[] = this.lsTree();
       const found = ls.find(object => {
         return object.name === treeName;
@@ -98,8 +109,25 @@ function repositreeInstanceHelper(repoDir: string): RepositreeInstance {
       this.currentTree = found.hash;
     },
 
+    catFile: function(fileName: string): string {
+      const ls: TreeObject[] = this.lsTree();
+      const found = ls.find(object => {
+        return object.name === fileName;
+      });
+      const cmd = `cd ${this.fullPath} && git cat-file ${found.hash}`;
+
+      try {
+        const output = child_process.execSync(cmd, { encoding: 'utf-8' });
+
+        return output;
+      } catch {
+        throw Error('No such file.');
+      }
+    },
+
     gitVersion: gitVersion,
   };
+
 
   return instance;
 }

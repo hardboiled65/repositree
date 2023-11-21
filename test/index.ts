@@ -1,5 +1,21 @@
+import path from 'path'
+
 import { checkoutRepository } from 'repositree'
 
-const repo = checkoutRepository(process.env.HOME + '/myorg/bash.git');
+const repo = checkoutRepository(path.resolve('../'));
 
-console.log(JSON.stringify(repo));
+console.log(repo.gitVersion());
+
+const branches = repo.branches();
+
+console.log(branches);
+
+const tree = repo.lsTree();
+
+console.log(tree);
+
+repo.cdTree('src');
+
+console.log(repo.currentTree);
+
+console.log(repo.lsTree());

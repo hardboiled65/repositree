@@ -19,10 +19,23 @@ export interface RepositreeInstance {
 
   branches: () => string[];
   /**
-   * Switch branch. `currentTree` set to HEAD.
+   * Switch branch. `currentTree` set to `branch`.
    */
   switchBranch: (branch: string) => void;
+  /**
+   * List current tree.
+   */
   lsTree: () => TreeObject[];
+  /**
+   * Change tree. `treeName` must be a valid tree object name.
+   */
   cdTree: (treeName: string) => void;
+  /**
+   * Get the content of blob object.
+   */
+  catFile: (fileName: string) => string;
+  /**
+   * Returns git version string.
+   */
   gitVersion: () => string;
 }
